@@ -1,0 +1,17 @@
+{
+  "name": "dicom_micro_service",
+  "version": "1.0.0",
+  "description": "a microservice to convert dicom to jpg/png",
+  "main": "index.js",
+  "dependencies": {
+    "body-parser": "^1.19.0",
+    "express-fileupload": "^1.1.6",
+    "express": "^4.17.1"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC"
+}
