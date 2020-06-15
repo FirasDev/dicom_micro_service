@@ -4,14 +4,17 @@ const bodyParser = require('body-parser');
 const fileUpload = require('express-fileupload');
 const fs = require('fs');
 const { once } = require('events');
-
 //initialization
+app.set('view engine', 'ejs');
 app.use(bodyParser.urlencoded({extended: true}));
-app.use(bodyParser.json());
+app.use(bodyParser.json({limit: '50mb'}));
 app.use(fileUpload());
 
-app.post('/upload_dicomm', (req,res)=>{
-    const file = req.files.sampleFile;
+app.use(express.static('dicommer/outputs'))
+
+
+app.post('/upload_dicomm', async (req,res)=>{
+    const file = req.files.file;
     const fileName = file.name;
     const filePath = './dicommer/downloads/' + fileName;
 
@@ -20,16 +23,15 @@ app.post('/upload_dicomm', (req,res)=>{
     file.mv(filePath, async(err)=>{
         try{
        const verif_result = await verif(fileName);
-       console.log("done");
-         
-        // if (verif_result)
-        // {
-        //     res.status(200).send("Verified");
-        // }
-        // else{
-        //     console.log("===="+verif_result+"=====");
-        //     res.status(404).send("Not verified");
-        // }
+       console.log("done");                
+        if (verif_result)
+        {
+            res.status(200).send("Verified");
+        }
+        else{
+            console.log("===="+verif_result+"=====");
+            res.status(404).send("Not verified");
+        }
     }catch(err){
         console.log('Error : failed to download file');
                 console.log(err);
@@ -72,6 +74,9 @@ const verif = async (fileName) => {
     scriptExecution.stderr.on('data', (data) => {
         // As said before, convert the Uint8Array to a readable string.
         console.log(uint8arrayToString(data));
+        if (uint8arrayToString(data).includes("finished")){
+            isVerified = true;
+        }
     });
 
     scriptExecution.on('exit', (code) => {
